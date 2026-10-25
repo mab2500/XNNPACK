@@ -154,7 +154,8 @@ void check_results(const OpInfo& op, const Tensor<A>& a, const Tensor<B>& b,
   (void)tol;
   for (const auto& i : EnumerateIndices(x.extents())) {
     if constexpr (is_integral<X>::value) {
-      const int32_t expected = op(a(i), b(i));
+      const int32_t expected =
+          op(static_cast<int32_t>(a(i)), static_cast<int32_t>(b(i)));
       ASSERT_EQ(expected, x(i)) << "i = " << index_to_string(i)
                                 << ", a(i) = " << a(i) << ", b(i) = " << b(i);
     } else {

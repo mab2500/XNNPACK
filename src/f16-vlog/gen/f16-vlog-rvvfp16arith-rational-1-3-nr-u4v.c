@@ -20,25 +20,25 @@
 
 // Extracts the exponent of the input `a` as a `float16` value.
 static XNN_INLINE vfloat16m4_t xnn_signed_getexp_f16(vfloat16m4_t a, size_t vl) {
-  const uint16_t sign_mask = 0x8000;
-  const uint16_t sign_and_exp_mask = 0xFC00;
-  const uint16_t bias_32_bits = 0x5000; // 32.0f in f16 bits
+  const int16_t sign_mask = -0x8000;
+  const int16_t sign_and_exp_mask = -0x0400;
+  const int16_t bias_32_bits = 0x5000; // 32.0f in f16 bits
   const xnn_float16 bias_47 = 47.0f;
 
   // If `a` is `0.0f`, flip its sign bit so that we return `-Inf`.
-  vuint16m4_t va = __riscv_vreinterpret_v_f16m4_u16m4(a);
+  vint16m4_t va = __riscv_vreinterpret_v_f16m4_i16m4(a);
   vbool4_t is_zero = __riscv_vmfeq_vf_f16m4_b4(a, 0.0f, vl);
-  va = __riscv_vor_vx_u16m4_mu(is_zero, va, va, sign_mask, vl);
+  va = __riscv_vor_vx_i16m4_mu(is_zero, va, va, sign_mask, vl);
 
   // Extract the exponent and shift the exponent to the most significant bits of
   // the mantissa.
-  const vuint16m4_t exp =
-      __riscv_vsrl_vx_u16m4(__riscv_vand_vx_u16m4(va, sign_and_exp_mask, vl), 5, vl);
+  const vint16m4_t exp =
+      __riscv_vsra_vx_i16m4(__riscv_vand_vx_i16m4(va, sign_and_exp_mask, vl), 5, vl);
 
   // Add the shifted exponent to `32.0f` by copying its bits to the mantissa,
   // then subtract out `47.0f`, i.e. the original `32.0f` plus the `15`
   // exponent bias, resulting in the unbiased exponent.
-  return __riscv_vfsub_vf_f16m4(__riscv_vreinterpret_v_u16m4_f16m4(__riscv_vor_vx_u16m4(exp, bias_32_bits, vl)), bias_47, vl);
+  return __riscv_vfsub_vf_f16m4(__riscv_vreinterpret_v_i16m4_f16m4(__riscv_vor_vx_i16m4(exp, bias_32_bits, vl)), bias_47, vl);
 }
 
 

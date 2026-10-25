@@ -292,13 +292,19 @@ YNN_ALWAYS_INLINE void store(T* ptr, vec<T, 1> value, size_t n) {
 }
 
 // Arithmetic that avoids triggering ubsan checks for signed integer overflow.
-inline int32_t add_no_overflow(int32_t a, int32_t b) {
+template <typename T, typename = std::enable_if_t<std::is_integral<T>::value &&
+                                                  sizeof(T) <= sizeof(int32_t)>>
+inline int32_t add_no_overflow(T a, T b) {
   return static_cast<int64_t>(a) + static_cast<int64_t>(b);
 }
-inline int32_t sub_no_overflow(int32_t a, int32_t b) {
+template <typename T, typename = std::enable_if_t<std::is_integral<T>::value &&
+                                                  sizeof(T) <= sizeof(int32_t)>>
+inline int32_t sub_no_overflow(T a, T b) {
   return static_cast<int64_t>(a) - static_cast<int64_t>(b);
 }
-inline int32_t mul_no_overflow(int32_t a, int32_t b) {
+template <typename T, typename = std::enable_if_t<std::is_integral<T>::value &&
+                                                  sizeof(T) <= sizeof(int32_t)>>
+inline int32_t mul_no_overflow(T a, T b) {
   return static_cast<int64_t>(a) * static_cast<int64_t>(b);
 }
 
@@ -472,7 +478,7 @@ YNN_ALWAYS_INLINE vec<bool, 1> operator>=(vec<T, 1> a, vec<T, 1> b) {
 template <typename T>
 YNN_ALWAYS_INLINE vec<T, 1> select(vec<bool, 1> cond, vec<T, 1> a,
                                    vec<T, 1> b) {
-  return vec<T, 1>{cond.v ? a : b};
+  return cond.v ? a : b;
 }
 
 template <typename T>

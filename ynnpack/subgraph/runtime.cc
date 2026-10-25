@@ -1053,7 +1053,7 @@ bool ynn_traceme_enabled() {
 
 // Slinky will automatically place allocates on the stack if the allocation is
 // smaller than this threshold.
-constexpr size_t auto_stack_threshold = 64 * 1024;
+constexpr size_t auto_stack_threshold = 16 * 1024;
 
 void init_context(slinky::eval_context& ctx) {
   // `get_dot_cost_models` is expensive due to a syscall to learn the current

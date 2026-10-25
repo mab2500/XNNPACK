@@ -2424,8 +2424,9 @@ bool rewrite_sum_to_dot(ynn_subgraph& subgraph, ynn_node& node,
   int num_k_dims = 0;
   for (size_t i = 0; i < max_rank; ++i) {
     if (reduce_op->k_dims[i]) {
-      if (!slinky::prove_true(a.extent(i) == b.extent(i))) {
-        // Don't handle broadcasted reduction dimensions.
+      if (!slinky::prove_true(a.extent(i) == b.extent(i)) ||
+          slinky::prove_true(a.extent(i) == 1)) {
+        // Don't handle broadcasted or unit reduction dimensions.
         return false;
       }
       std::swap(perm_a[num_k_dims++], perm_a[i]);

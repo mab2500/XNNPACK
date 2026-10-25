@@ -133,7 +133,7 @@ TEST_P(Test, batch_eq) {
   TEST_REQUIRES_ARCH_FLAGS(param.arch_flags);
   const size_t batch_tile = param.batch_tile * get_batch_scale(param.elem_size);
   Tester()
-      .batch_size(batch_tile * get_batch_scale(param.elem_size))
+      .batch_size(batch_tile)
       .Test(param.kernel);
 }
 
@@ -144,7 +144,7 @@ TEST_P(Test, batch_div) {
   for (size_t batch_size = batch_tile;
        batch_size < batch_tile * 5 && !HasFatalFailure();
        batch_size += batch_tile) {
-    Tester().batch_size(batch_tile).Test(param.kernel);
+    Tester().batch_size(batch_size).Test(param.kernel);
   }
 }
 
